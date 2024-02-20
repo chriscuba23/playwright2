@@ -17,3 +17,11 @@ def test_login(page: Page):
     page.get_by_role("button", name="Log In").click()
     #verify user have logged in
     assert page.get_by_text("demouser").is_visible()
+    page.locator("img[alt='iPhone 12']").is_visible()
+    page.locator("div.shelf-item__buy-btn").nth(1).click()
+    assert page.locator("div.float-cart.float-cart--open").is_visible()
+
+    
+
+
+    
