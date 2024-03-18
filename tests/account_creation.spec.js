@@ -27,7 +27,7 @@ let contactPhone = faker.string.numeric({ length: 11 })
 let contactPhone2 = '976.620.4768 x7104' // faker.phone.number() // FIXME number validation is not versatile. Has to accept greater string lengths and formats
 
 // FIXME address has no validation in relativity. For example city and state/province may not match but still be accepted
-// FIXME address data is not mandatory to be entered and does not throw an error if it dont
+// FIXME address data is not mandatory to be entered at the Contact Creation form and does not throw an error if it doesnt
 
 let contactAddress1 = faker.location.streetAddress();
 let contactAddress2 = faker.location.secondaryAddress(); // FIXME secondaryAddress info not appearing at Contact List
