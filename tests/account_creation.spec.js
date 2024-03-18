@@ -41,56 +41,55 @@ let contactCountry = faker.location.country();
 let contactArrayPost = [contactFirstName, contactLastName, (JSON.stringify(contactDateOfBirth)).substring(1, (JSON.stringify(contactDateOfBirth)).indexOf('T')), contactEmail, contactPhone, contactAddress1, contactAddress2, contactCity, contactStateOrProvince, contactPostalCode, contactCountry]
 let contactArrayGet = [`${contactFirstName} ${contactLastName}`, (JSON.stringify(contactDateOfBirth)).substring(1, (JSON.stringify(contactDateOfBirth)).indexOf('T')), contactEmail, contactPhone, contactAddress1, `${contactCity} ${contactStateOrProvince} ${contactPostalCode}`, contactCountry]
 
-test('Positive testing', async ({ page }) => {
+test('Positive and negative testing', async ({ page }) => {
 
   const loginPage = new LoginPage(page);
   const registrationPage = new RegistrationPage(page);
   const contactsPage = new ContactsPage(page);
   const addContactsPage = new AddContactsPage(page);
 
-  await loginPage.open();
-  await loginPage.assertLoggedOut();
+  // Positive
+
+  await loginPage.open(); // open Log In page
+  await loginPage.assertLoggedOut(); // verify we are logged out
   await loginPage.clickRegisterButton();
   await registrationPage.fillRegistrationForm(userName, userSurname, userEmail, userPass);
-  await registrationPage.submitRegistrationForm(true);
-  await contactsPage.assertContactsPage();
+  await registrationPage.submitRegistrationForm(true); // submit the registration form and assert success
+  await contactsPage.assertContactsPage(); // verify the content of the Contacts Page
   await contactsPage.clickLogoutButton();
   await loginPage.assertLoggedOut();
-  await loginPage.logIn(userEmail, userPass, true);
+  await loginPage.logIn(userEmail, userPass, true); // login succesfully and assert success
   await contactsPage.clickAddANewContact();
-  await addContactsPage.addNewContact(contactArrayPost)
-  await addContactsPage.submitNewContact(true);
-  await contactsPage.verifyContactRow(contactArrayGet)
+  await addContactsPage.addNewContact(contactArrayPost) // fill in the add contact form with the contact info
+  await addContactsPage.submitNewContact(true); // submit the add contact form and assert success
+  await contactsPage.verifyContactRow(contactArrayGet) // verify that a record row has been created successfully
   await contactsPage.clickLogoutButton()
   await loginPage.assertLoggedOut();
-  
-});
 
-test('Negative testing', async ({ page }) => {
+  // Negative
 
-  const loginPage = new LoginPage(page);
-  const registrationPage = new RegistrationPage(page);
-  const contactsPage = new ContactsPage(page);
-  const addContactsPage = new AddContactsPage(page);
   const phoneIndex = contactArrayPost.indexOf(contactPhone);
   const emailIndex = contactArrayPost.indexOf(contactEmail);
 
   contactArrayPost.splice(phoneIndex, 1, contactPhone2); // replace contactPhone with contactPhone2 to explicitly cause a failure
-  contactArrayPost.splice(emailIndex, 1, contactEmail.replace('@', '')) // remove @ sign from the email to explicitly cause a failure
+  contactArrayPost.splice(emailIndex, 1, contactEmail.replace('@', '')) // remove '@' sign from the email to explicitly cause a failure
 
   await loginPage.open();
-  await loginPage.logIn(userEmailFalse, userPass, false);
+  await loginPage.logIn(userEmailFalse, userPass, false); // log-in with incorrect credentials. Falsy state is that the login fails due to invalid credentials 
   await loginPage.logIn(userEmail, userPassFalse, false);
   await loginPage.logIn(userEmailFalse, userPassFalse, false);
+  await loginPage.logIn('', '', false);
   await loginPage.clickRegisterButton();
   await registrationPage.fillRegistrationForm(userName, userSurname, userEmail, userPass);
-  await registrationPage.submitRegistrationForm(false); // NOTE test if duplicate accounts cannot be created
+  await registrationPage.submitRegistrationForm(false); // NOTE test that duplicate accounts cannot be created. Falsy state is that the registration form is not submitted due to erroneous data 
   await registrationPage.cancelRegistrationForm()
   await loginPage.logIn(userEmail, userPass, true);
   await contactsPage.clickAddANewContact();
   await addContactsPage.addNewContact(contactArrayPost) // FIXME duplicate contacts can be created. Since this can indeed happen we should add the email as a unique identifier and warn the user
-  await addContactsPage.submitNewContact(false) // NOTE submit Contact Creation form with erroneous data
+  await addContactsPage.submitNewContact(false) // NOTE submit Contact Creation form. Falsy state is that the contact creation form is not submitted due to erroneous data 
   await addContactsPage.cancelAddContactForm()
+  await contactsPage.clickLogoutButton()
+  await loginPage.assertLoggedOut();
 
 });
 
