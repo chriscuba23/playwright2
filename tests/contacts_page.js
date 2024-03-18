@@ -33,6 +33,7 @@ class ContactsPage {
     await expect(this.page).toHaveTitle(/Add Contact/);
     await expect(this.page).toHaveURL('https://thinking-tester-contact-list.herokuapp.com/addContact');
   }
+  
   async verifyContactRow(dataArray) {
     await expect(this.page.locator('h1')).toHaveText('Contact List');
 

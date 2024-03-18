@@ -35,7 +35,6 @@ class RegistrationPage {
       await expect(this.page).toHaveURL('https://thinking-tester-contact-list.herokuapp.com/addUser');
     }
 
-
   }
 
   async cancelRegistrationForm() {
