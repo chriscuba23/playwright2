@@ -32,6 +32,7 @@ Page Object Model:
 The test defines dedicated Page Objects for the login, registration, add contacts and contacts page encapsulating all the elements and methods related to the previous functionalities.
 
 Comprehensive test reports are generated after each test run, highlighting test results, including passed, failed, and skipped tests.
+
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 In order to run the tests please type "npx playwright test --project chromium --debug" in the console to run it step by step in debug mode. You can change browser from chromium to firefox or webkit if you want
