@@ -26,7 +26,7 @@ let contactEmail = faker.internet.email({ firstName: contactFirstName, lastName:
 let contactPhone = faker.string.numeric({ length: 11 })
 let contactPhone2 = '976.620.4768 x7104' // faker.phone.number() // FIXME number validation is not versatile. Has to accept greater string lengths and formats
 
-// FIXME address has no validation in relativity. For example city and state/province may not match but still be accepted
+// FIXME address has no validation in relativity. For example city and state/province may not match with eachother but still be accepted
 // FIXME address data is not mandatory to be entered at the Contact Creation form and does not throw an error if it doesnt
 
 let contactAddress1 = faker.location.streetAddress();
@@ -81,12 +81,14 @@ test('Positive and negative testing', async ({ page }) => {
   await loginPage.logIn('', '', false);
   await loginPage.clickRegisterButton();
   await registrationPage.fillRegistrationForm(userName, userSurname, userEmail, userPass);
-  await registrationPage.submitRegistrationForm(false); // NOTE test that duplicate accounts cannot be created. Falsy state is that the registration form is not submitted due to erroneous data 
+  await registrationPage.submitRegistrationForm(false); // test that duplicate accounts cannot be created. Falsy state is that the registration form is not submitted due to erroneous data 
+  await registrationPage.fillRegistrationForm(userName, userSurname, contactArrayPost[emailIndex], userPass); 
+  await registrationPage.submitRegistrationForm(false); // test a falsy email (without '@')
   await registrationPage.cancelRegistrationForm()
   await loginPage.logIn(userEmail, userPass, true);
   await contactsPage.clickAddANewContact();
   await addContactsPage.addNewContact(contactArrayPost) // FIXME duplicate contacts can be created. Since this can indeed happen we should add the email as a unique identifier and warn the user
-  await addContactsPage.submitNewContact(false) // NOTE submit Contact Creation form. Falsy state is that the contact creation form is not submitted due to erroneous data 
+  await addContactsPage.submitNewContact(false) // submit Contact Creation form. Falsy state is that the contact creation form is not submitted due to erroneous data 
   await addContactsPage.cancelAddContactForm()
   await contactsPage.clickLogoutButton()
   await loginPage.assertLoggedOut();

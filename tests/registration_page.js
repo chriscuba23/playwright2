@@ -26,12 +26,12 @@ class RegistrationPage {
 
     if (isSuccessful) {
 
-      await expect(this.page.getByText('Email address is already in use')).not.toBeAttached();
+      await expect(this.page.getByText(/^(Email address is already in use|User validation failed: email: Email is invalid)$/)).not.toBeAttached();
       await expect(this.page).toHaveURL('https://thinking-tester-contact-list.herokuapp.com/contactList');
     }
 
     else {
-      await expect(this.page.getByText('Email address is already in use')).toBeAttached();
+      await expect(this.page.getByText(/^(Email address is already in use|User validation failed: email: Email is invalid)$/)).toBeAttached();
       await expect(this.page).toHaveURL('https://thinking-tester-contact-list.herokuapp.com/addUser');
     }
 
