@@ -13,7 +13,7 @@ const AddContactsPage = require('./add_contacts_page');
 let userName = faker.person.firstName()
 let userSurname = faker.person.lastName()
 let userEmail = faker.internet.email({ firstName: userName, lastName: userSurname })
-let userPass = faker.internet.password()
+let userPass = faker.internet.password() // FIXME should have a stronger password policy
 let userEmailFalse = faker.internet.email() // for Negative email test
 let userPassFalse = faker.internet.password() // for Negative password test
 
@@ -21,12 +21,12 @@ let userPassFalse = faker.internet.password() // for Negative password test
 
 let contactFirstName = faker.person.firstName();
 let contactLastName = faker.person.lastName();
-let contactDateOfBirth = faker.date.past() // should stringify the output afterwards since we want a string, not an object
+let contactDateOfBirth = faker.date.past() // should stringify the output afterwards since we want a string, not an object //LINK :41
 let contactEmail = faker.internet.email({ firstName: contactFirstName, lastName: contactLastName })
 let contactPhone = faker.string.numeric({ length: 11 })
 let contactPhone2 = '976.620.4768 x7104' // faker.phone.number() // FIXME number validation is not versatile. Has to accept greater string lengths and formats
 
-// FIXME address has no validation in relativity. For example city and state/province may not match with eachother but still be accepted
+// FIXME address has no validation in relativity. For example city and state/province may not match with each other but still be accepted
 // FIXME address data is not mandatory to be entered at the Contact Creation form and does not throw an error if it doesnt
 
 let contactAddress1 = faker.location.streetAddress();
@@ -50,7 +50,7 @@ test('Positive and negative testing', async ({ page }) => {
 
   // Positive
 
-  await loginPage.open(); // open Log In page
+  await loginPage.open(); // open Contact List App page
   await loginPage.assertLoggedOut(); // verify we are logged out
   await loginPage.clickRegisterButton();
   await registrationPage.fillRegistrationForm(userName, userSurname, userEmail, userPass);
@@ -65,6 +65,8 @@ test('Positive and negative testing', async ({ page }) => {
   await contactsPage.verifyContactRow(contactArrayGet) // verify that a record row has been created successfully
   await contactsPage.clickLogoutButton()
   await loginPage.assertLoggedOut();
+
+  // REVIEW based on the API documentation we could add a "Delete Contact" button and/or other triggers of calls that are not available through the UI.
 
   // Negative
 
@@ -82,7 +84,7 @@ test('Positive and negative testing', async ({ page }) => {
   await loginPage.clickRegisterButton();
   await registrationPage.fillRegistrationForm(userName, userSurname, userEmail, userPass);
   await registrationPage.submitRegistrationForm(false); // test that duplicate accounts cannot be created. Falsy state is that the registration form is not submitted due to erroneous data 
-  await registrationPage.fillRegistrationForm(userName, userSurname, contactArrayPost[emailIndex], userPass); 
+  await registrationPage.fillRegistrationForm(userName, userSurname, contactArrayPost[emailIndex], userPass);
   await registrationPage.submitRegistrationForm(false); // test a falsy email (without '@')
   await registrationPage.cancelRegistrationForm()
   await loginPage.logIn(userEmail, userPass, true);
