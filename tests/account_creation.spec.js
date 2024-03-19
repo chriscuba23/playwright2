@@ -1,4 +1,4 @@
-// Importing necessary libraries and modules
+// ANCHOR Importing necessary libraries and modules
 
 const { faker } = require('@faker-js/faker');
 const { chromium } = require('playwright');
@@ -8,7 +8,7 @@ const RegistrationPage = require('./registration_page');
 const ContactsPage = require('./contacts_page');
 const AddContactsPage = require('./add_contacts_page');
 
-// Generating fake user data using faker library
+// ANCHOR Generating fake user data using faker library
 
 let userName = faker.person.firstName()
 let userSurname = faker.person.lastName()
@@ -17,7 +17,7 @@ let userPass = faker.internet.password() // FIXME should have a stronger passwor
 let userEmailFalse = faker.internet.email() // for Negative email test
 let userPassFalse = faker.internet.password() // for Negative password test
 
-// Generating fake contact information using faker library
+// ANCHOR Generating fake contact information using faker library
 
 let contactFirstName = faker.person.firstName();
 let contactLastName = faker.person.lastName();
@@ -48,30 +48,34 @@ test('Positive and negative testing', async ({ page }) => {
   const contactsPage = new ContactsPage(page);
   const addContactsPage = new AddContactsPage(page);
 
-  // Positive
+  // ANCHOR Positive cases
 
   await loginPage.open(); // open Contact List App page
   await loginPage.assertLoggedOut(); // verify we are logged out
-  await loginPage.clickRegisterButton();
-  await registrationPage.fillRegistrationForm(userName, userSurname, userEmail, userPass);
+  await loginPage.clickRegisterButton(); // click Register button
+  await registrationPage.fillRegistrationForm(userName, userSurname, userEmail, userPass); // fill in the registration form with valid data
   await registrationPage.submitRegistrationForm(true); // submit the registration form and assert success
   await contactsPage.assertContactsPage(); // verify the content of the Contacts Page
-  await contactsPage.clickLogoutButton();
+  await contactsPage.clickLogoutButton(); // logout
   await loginPage.assertLoggedOut();
   await loginPage.logIn(userEmail, userPass, true); // login succesfully and assert success
-  await contactsPage.clickAddANewContact();
-  await addContactsPage.addNewContact(contactArrayPost) // fill in the add contact form with the contact info
-  await addContactsPage.submitNewContact(true); // submit the add contact form and assert success
-  await contactsPage.verifyContactRow(contactArrayGet) // verify that a record row has been created successfully
+  await contactsPage.clickAddANewContact(); // begin the journey of adding a new contact
+  await addContactsPage.addNewContact(contactArrayPost) // fill in the "add contact" form with the contact info
+  await addContactsPage.submitNewContact(true); // submit the "add contact" form and assert success
+  await contactsPage.verifyContactRow(contactArrayGet) // verify that a record row with the correct data has been created successfully
   await contactsPage.clickLogoutButton()
   await loginPage.assertLoggedOut();
 
   // REVIEW based on the API documentation we could add a "Delete Contact" button and/or other triggers of calls that are not available through the UI.
 
-  // Negative
+  // ANCHOR Negative cases
 
-  const phoneIndex = contactArrayPost.indexOf(contactPhone);
+  // find the array index of the given items
+
+  const phoneIndex = contactArrayPost.indexOf(contactPhone); 
   const emailIndex = contactArrayPost.indexOf(contactEmail);
+
+  // tamper with data in order to to explicitly cause a failure in validations
 
   contactArrayPost.splice(phoneIndex, 1, contactPhone2); // replace contactPhone with contactPhone2 to explicitly cause a failure
   contactArrayPost.splice(emailIndex, 1, contactEmail.replace('@', '')) // remove '@' sign from the email to explicitly cause a failure
@@ -97,7 +101,7 @@ test('Positive and negative testing', async ({ page }) => {
 
 });
 
-// Closing the browser after all tests have finished running
+// ANCHOR Closing the browser after all tests have finished running
 
 test.afterAll(async () => {
   const browser = await chromium.launch();
