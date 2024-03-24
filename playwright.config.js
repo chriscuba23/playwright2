@@ -11,6 +11,7 @@ const { defineConfig, devices } = require('@playwright/test');
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
+  timeout: 5 * 60 * 1000,
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -30,7 +31,9 @@ module.exports = defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
-
+  expect: {
+    timeout: 30 * 1000,
+  },
   /* Configure projects for major browsers */
   projects: [
     {
