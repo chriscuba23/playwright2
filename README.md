@@ -35,7 +35,7 @@ Comprehensive test reports are generated after each test run, highlighting test 
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-In order to run the tests please type "npx playwright test --project chromium --debug" in the console to run it step by step in debug mode. You can change browser from chromium to firefox or webkit if you want
+In order to run the tests please type in console "npm i" first to get the packages and then "npx playwright test --project chromium --debug" to run the test step by step in debug mode. You can change browser from chromium to firefox or webkit if you want
 
 We used Playwright framework for its robustness, locator targeting capabilities and detailed execution/reporting. We used JavaScript because it is a known, versatile and widely-supported language, empowered by Playwright
 
