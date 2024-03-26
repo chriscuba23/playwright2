@@ -34,7 +34,7 @@ let discount = {
 let items = Object.keys(groceries).length
 
 
-test.only('purchase test', async ({ page }) => {
+test('purchase test', async ({ page }) => {
 
     const addProductPage = new AddProductPage(page);
 
