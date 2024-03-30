@@ -84,8 +84,29 @@ class SearchFlight {
 
     // Assert the response status and body
     const responseBody = await response.json();
-   
-    console.log(responseBody.data.search.flights)
+
+    let filteredFlightsCount = responseBody.data.search.filteredFlightsCount
+    let displayedFlightsCount = Object.keys(responseBody.data.search.flights).length
+    let priceRangeMin = responseBody.data.search.resultSetMetaData.priceRange.min
+    let priceRangeMax = responseBody.data.search.resultSetMetaData.priceRange.max
+    let travelTimeRangeMin = responseBody.data.search.resultSetMetaData.travelTimeRange.min
+    let travelTimeRangeMax = responseBody.data.search.resultSetMetaData.travelTimeRange.max
+    let marketingCarriersCount = Object.keys(responseBody.data.search.resultSetMetaData.marketingCarriers).length
+
+    for (let index = 0; index < marketingCarriersCount; index++) {
+      console.log(responseBody.data.search.resultSetMetaData.marketingCarriers[index].name)
+      
+    }
+
+    console.log('-----------------')
+
+    for (let index = 0; index < displayedFlightsCount; index++) {
+      console.log(responseBody.data.search.flights[index].bounds[0].segments[0].marketingCarrier.name)
+      
+    }
+
+
+    this.page.pause()
 
 
   }
