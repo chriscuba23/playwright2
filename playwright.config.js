@@ -50,6 +50,18 @@ module.exports = defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
+    {
+      name: 'chrome',
+      use: {
+        headless: true,
+        ignoreHTTPSErrors: true,
+        trace: 'on',
+        screenshot: 'on',
+        channel: "chrome",
+        video: 'on'
+      },
+
+    }
 
     /* Test against mobile viewports. */
     // {
