@@ -189,7 +189,7 @@ class SearchFlight {
     await airlineCheckbox.click()
     await expect(airlineCheckbox).not.toBeChecked()
 
-    // NOTE scroll until you reach the end of the page and you thave no more infinite lazy loading, so as to grab the '/graphql/SearchMoreOnResultPage' calls as well
+    // NOTE scroll until you reach the end of the page and have no more infinite lazy loading, so as to grab the '/graphql/SearchMoreOnResultPage' calls as well
 
     await scrollUntilElementIsVisible(this.page, 'p:has-text("That\'s it!")')
 
