@@ -7,9 +7,15 @@ class SearchFlight {
 
 
   async open() {
+
+    let iAcceptButton = this.page.getByTestId('cookieBanner-confirmButton')
+
     await this.page.goto('https://www.flightnetwork.com/');
     await expect(this.page).toHaveTitle(/Cheap Flights: Save up to 60% on Airline Tickets & Airfare | Flight Network/);
     await expect(this.page.locator('h1 > span')).toHaveText('The best airline tickets and airfares for cheap flights');
+    await iAcceptButton.click()
+    await expect(iAcceptButton).not.toBeAttached()
+    
   }
 
   async searchForFlights(tripType, origin, destination, numOfAdultPassengers, numOfChildPassengers, numOfInfantPassengers, cabinClass, hasNonStopFlights) {
@@ -117,6 +123,10 @@ class SearchFlight {
     await expect(allButton).toContainText('All')
     await expect(allButton).toHaveClass(/selectedOption/);
 
+    let segmentStopsCount = await this.page.getByTestId('searchResults-segment-stops').filter({ hasText: '1 stop' }).count()
+
+    expect(parseInt(segmentStopsCount)).toBeGreaterThan(0);
+
     // click Nonstop flights
 
     await nonStopFlightsButton.click()
@@ -147,21 +157,17 @@ class SearchFlight {
       expect(segments).toHaveLength(1);
     });
 
-    // flights.forEach(flight => {
-    //   expect(flight).toHaveProperty('bounds[0].segments');
-    //   let segments = flight.bounds[0].segments;
-    //   console.log(segments)
-    //   let filteredSegments = segments.filter((segment) => segment.__typename === 'TripSegment')
-    //   expect(filteredSegments).not.toBe.undefined;
-    //   expect(filteredSegments.length).toBeLessThan(3)
-    //   expect(filteredSegments.length).toBeGreaterThan(0)
-    // });
+
+    await expect(this.page.getByTestId('searchResults-segment-stops').filter({ hasText: '1 stop' })).toHaveCount(0);
 
     // NOTE test Reset filters
 
     await resetFilterStops.click()
     await expect(filterByHeaderFlights).toContainText(totalFlightsText)
     await expect(allButton).toHaveClass(/selectedOption/);
+    await expect(resetFilterAll).not.toBeAttached()
+    await expect(resetFilterStops).not.toBeAttached()
+    await expect(selectedFilterIndicator).not.toBeAttached()
 
   }
 
@@ -178,84 +184,92 @@ class SearchFlight {
     let selectAllButton = this.page.getByRole('button', { name: 'Select all' })
     let airlineCheckbox = this.page.locator(`li > label[title="${airline}"]`)
 
+    let doneButton = this.page.getByTestId('filtersForm-applyFilters-button')
+    let clearButton = this.page.getByTestId('filtersForm-resetFilters-button')
+
     let resetFilterAirlines = this.page.getByTestId('resultPage-filterHeader-AIRLINESFilterResetButton-button')
 
     await expect(filterByButton).toContainText('Filter by')
     await filterByButton.click()
     await expect(filterByButton).toContainText('Close')
 
+    let airlineResultsCount = await this.page.locator(`div.css-akpcxl:has-text("${airline}")`).allTextContents()
+
+    expect(parseInt(airlineResultsCount.length)).toBeGreaterThan(0);
+
     // deselect an Airline checkbox
 
     await airlineCheckbox.click()
+
+    const responsePromiseFilteredAirline = await this.page.waitForResponse((response) => response.url().includes("/graphql/SearchOnResultPage"));
+
     await expect(airlineCheckbox).not.toBeChecked()
+    await expect(selectedFilterIndicator).toContainText('Airlines')
+    await expect(resetFilterAll).toContainText('Reset filter')
+    await expect(resetFilterAirlines).toContainText('Reset filter')
+
+    // Assert the response status and body
+    const responseBodyFilteredAirline = await responsePromiseFilteredAirline.json();
 
     // NOTE scroll until you reach the end of the page and have no more infinite lazy loading, so as to grab the '/graphql/SearchMoreOnResultPage' calls as well
 
-    await scrollUntilElementIsVisible(this.page, 'p:has-text("That\'s it!")')
+    await scrollUntilElementIsVisible(this.page, 'p:has-text("No more results.")')
 
-    await this.page.pause()
-
-
-
-
-
-    const responsePromise = await this.page.waitForResponse((response) => response.url().includes("/graphql/SearchOnResultPage"));
-
-
-
-    // Assert the response status and body
-    const responseBody = await responsePromise.json();
-
-    let filteredFlightsCount = responseBody.data.search.filteredFlightsCount
-    let flightsCount = responseBody.data.search.flightsCount
+    let filteredFlightsCount = responseBodyFilteredAirline.data.search.filteredFlightsCount
 
     await expect(filterByHeaderFlights).toContainText(`${filteredFlightsCount} of ${totalFlightsText.replace(': ', '').toLowerCase()}`)
 
-    let displayedFlightsCount = Object.keys(responseBody.data.search.flights).length
-    let priceRangeMin = responseBody.data.search.resultSetMetaData.priceRange.min
-    let priceRangeMax = responseBody.data.search.resultSetMetaData.priceRange.max
-    let travelTimeRangeMin = responseBody.data.search.resultSetMetaData.travelTimeRange.min
-    let travelTimeRangeMax = responseBody.data.search.resultSetMetaData.travelTimeRange.max
-    let marketingCarriersCount = Object.keys(responseBody.data.search.resultSetMetaData.marketingCarriers).length
-    let flights = responseBody.data.search.flights
+    await expect(this.page.locator(`div.css-akpcxl:has-text("${airline}")`)).toHaveCount(0);
 
-    console.log('Available airlines:\n')
+    // const responsePromise = await this.page.waitForResponse((response) => response.url().includes("/graphql/SearchOnResultPage"));
 
-    responseBody.data.search.resultSetMetaData.marketingCarriers.forEach(carrier => {
-      console.log(carrier.name);
-    });
+    // // Assert the response status and body
+    // const responseBody = await responsePromise.json();
 
-    console.log('----------------------')
+    // let flightsCount = responseBody.data.search.flightsCount
 
-    console.log(`${displayedFlightsCount} displayed flights (${filteredFlightsCount} filtered / ${flightsCount} total):\n`)
+    // await expect(filterByHeaderFlights).toContainText(`${filteredFlightsCount} of ${totalFlightsText.replace(': ', '').toLowerCase()}`)
 
-    responseBody.data.search.flights.forEach(flight => {
-      console.log(flight.bounds[0].segments[0].marketingCarrier.name);
-    });
+    // let displayedFlightsCount = Object.keys(responseBody.data.search.flights).length
+    // let priceRangeMin = responseBody.data.search.resultSetMetaData.priceRange.min
+    // let priceRangeMax = responseBody.data.search.resultSetMetaData.priceRange.max
+    // let travelTimeRangeMin = responseBody.data.search.resultSetMetaData.travelTimeRange.min
+    // let travelTimeRangeMax = responseBody.data.search.resultSetMetaData.travelTimeRange.max
+    // let marketingCarriersCount = Object.keys(responseBody.data.search.resultSetMetaData.marketingCarriers).length
+    // let flights = responseBody.data.search.flights
 
-    console.log('Non stop flights: ----------------------')
+    // console.log('Available airlines:\n')
 
-    flights.forEach(flight => {
-      expect(flight).toHaveProperty('bounds[0].segments');
-      let segments = flight.bounds[0].segments;
-      console.log(segments)
-      expect(segments).toHaveLength(1);
-    });
+    // responseBody.data.search.resultSetMetaData.marketingCarriers.forEach(carrier => {
+    //   console.log(carrier.name);
+    // });
+
+    // console.log('----------------------')
+
+    // console.log(`${displayedFlightsCount} displayed flights (${filteredFlightsCount} filtered / ${flightsCount} total):\n`)
+
+    // responseBody.data.search.flights.forEach(flight => {
+    //   console.log(flight.bounds[0].segments[0].marketingCarrier.name);
+    // });
+
+    // console.log('Non stop flights: ----------------------')
 
     // flights.forEach(flight => {
     //   expect(flight).toHaveProperty('bounds[0].segments');
     //   let segments = flight.bounds[0].segments;
     //   console.log(segments)
-    //   let filteredSegments = segments.filter((segment) => segment.__typename === 'TripSegment')
-    //   expect(filteredSegments).not.toBe.undefined;
-    //   expect(filteredSegments.length).toBeLessThan(3)
-    //   expect(filteredSegments.length).toBeGreaterThan(0)
+    //   expect(segments).toHaveLength(1);
     // });
 
+    // NOTE test Clear button
 
-    await resetFilterAirlines.click()
+    await clearButton.click()
     await expect(filterByHeaderFlights).toContainText(totalFlightsText)
-    await expect(allButton).toHaveClass(/selectedOption/);
+    await expect(resetFilterAll).not.toBeAttached()
+    await expect(resetFilterAirlines).not.toBeAttached()
+    await expect(selectedFilterIndicator).not.toBeAttached()
+
+    await this.page.pause()
 
   }
 
@@ -265,6 +279,6 @@ module.exports = SearchFlight;
 
 async function scrollUntilElementIsVisible(page, locator) {
   while (!(await page.locator(locator).isVisible())) {
-      await page.mouse.wheel(0, 100);
+    await page.mouse.wheel(0, 1000);
   }
 }

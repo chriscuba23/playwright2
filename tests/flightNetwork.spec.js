@@ -5,8 +5,8 @@ const { chromium } = require('playwright');
 const { test } = require('@playwright/test');
 const SearchFlight = require('./search_flight_page');
 
-let origin = 'ATH' //faker.airline.airport().iataCode
-let destination = 'IST' //faker.airline.airport().iataCode
+let origin = 'ATH' //faker.airline.airport().iataCode // NOTE Athens
+let destination = 'ARN' //faker.airline.airport().iataCode // NOTE Stockholm
 let tripType = 'oneWay' // NOTE could be 'return', 'oneWay', 'multiStop'
 let cabinClass = 'First' // NOTE could be 'Economy', 'Premium', 'Business', 'First'
 let availableAirlines 

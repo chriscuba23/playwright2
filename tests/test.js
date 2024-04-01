@@ -32,3 +32,12 @@ console.log(filteredCountry)
 console.log(filteredCountryObj)
 
 
+    // flights.forEach(flight => {
+    //   expect(flight).toHaveProperty('bounds[0].segments');
+    //   let segments = flight.bounds[0].segments;
+    //   console.log(segments)
+    //   let filteredSegments = segments.filter((segment) => segment.__typename === 'TripSegment')
+    //   expect(filteredSegments).not.toBe.undefined;
+    //   expect(filteredSegments.length).toBeLessThan(3)
+    //   expect(filteredSegments.length).toBeGreaterThan(0)
+    // });
