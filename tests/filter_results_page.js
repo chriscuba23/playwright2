@@ -199,10 +199,12 @@ class FilterResults {
     await this.page.mouse.down(); // click down left mouse button and hold
     await this.page.mouse.move(startFromX + offsetFromX, startFromY); // drag to the given offset
     await this.page.mouse.up(); // release mouse button
+    await this.page.waitForTimeout(3000);
   
     await this.page.mouse.move(startToX, startToY);
     await this.page.mouse.down();
     await this.page.mouse.move(startToX + offsetToX, startToY);
+    await this.page.waitForTimeout(3000);
     await this.page.mouse.up();
 
     // Waiting for the response containing filtered flights by price
