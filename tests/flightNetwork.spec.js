@@ -20,6 +20,7 @@ let destination = 'ARN'; // Destination airport code (Stockholm)
 // declaring hardcoded-value variables
 let tripType = 'oneWay'; // Trip type (could be 'return', 'oneWay', 'multiStop')
 let cabinClass = 'First'; // Cabin class (could be 'Economy', 'Premium', 'Business', 'First')
+let numOfPassengers = {adult: 2, child: 2, infant: 1}
 let pixelsToDragPriceHandles = { min: 10, max: -500 }
 let pixelsToDragTimeHandles = { max: -400 }
 
@@ -32,7 +33,7 @@ test.beforeEach(async () => {
     searchFlight = new SearchFlight(page); // Creating an instance of SearchFlight page
     filterResults = new FilterResults(page); // Creating an instance of Filter page
     await searchFlight.open(); // Opening search flight page
-    availableAirlines = await searchFlight.searchForFlights(tripType, origin, destination, 2, 2, 1, cabinClass, false); // Performing flight search and assigning the airlines from the response to a variable
+    availableAirlines = await searchFlight.searchForFlights(tripType, origin, destination, numOfPassengers.adult, numOfPassengers.child, numOfPassengers.infant, cabinClass, false); // Performing flight search and assigning the airlines from the response to a variable
 });
 
 test('Search Flight and filter by Number of Stops', async () => {
