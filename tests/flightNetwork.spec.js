@@ -23,15 +23,12 @@ let cabinClass = 'First'; // Cabin class (could be 'Economy', 'Premium', 'Busine
 
 let availableAirlines; // Declaring variable that will hold the airlines of the response
 
-test.beforeAll(async () => {
+test.beforeEach(async () => {
     // Launching Chromium browser and creating a new page
     browser = await chromium.launch();
     page = await browser.newPage();
     searchFlight = new SearchFlight(page); // Creating an instance of SearchFlight page
     filterResults = new FilterResults(page); // Creating an instance of Filter page
-});
-
-test.beforeEach(async () => {
     await searchFlight.open(); // Opening search flight page
     availableAirlines = await searchFlight.searchForFlights(tripType, origin, destination, 2, 2, 1, cabinClass, false); // Performing flight search and assigning the airlines from the response to a variable
 });
