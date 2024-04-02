@@ -1,55 +1,57 @@
 // Importing necessary libraries and modules
-const { faker } = require('@faker-js/faker'); // Importing faker library
 const { chromium } = require('playwright'); // Importing Chromium from Playwright
 const { test } = require('@playwright/test'); // Importing test function from Playwright
+const { faker } = require('@faker-js/faker');
 const SearchFlight = require('./search_flight_page'); // Importing SearchFlight class from search_flight_page module
+const FilterResults = require('./filter_results_page'); // Importing FilterResults class from filters_results_page module
 
-let browser; // Declare browser variable
-let page; // Declare page variable
+let browser;
+let page;
 let searchFlight; // searchFlight instance
+let filterResults; // filterResults instance
 
-// Generating flight data using faker library or initializing hardcoded data
 let origin = 'ATH'; // Origin airport code (Athens)
 let destination = 'ARN'; // Destination airport code (Stockholm)
 
-// initializing hardcoded data
+// NOTE we can try different origin and destination airports using a faker library but may introduce flakyness
+// let origin = faker.airline.airport().iataCode
+// let destination = faker.airline.airport().iataCode
+
+// declaring hardcoded-value variables
 let tripType = 'oneWay'; // Trip type (could be 'return', 'oneWay', 'multiStop')
 let cabinClass = 'First'; // Cabin class (could be 'Economy', 'Premium', 'Business', 'First')
 
-// Declare availableAirlines variable that will hold the airlines of the response
+let availableAirlines; // Declaring variable that will hold the airlines of the response
 
-let availableAirlines;
-
-test.beforeEach(async () => {
+test.beforeAll(async () => {
     // Launching Chromium browser and creating a new page
     browser = await chromium.launch();
     page = await browser.newPage();
-    searchFlight = new SearchFlight(page); // Creating an instance of SearchFlight
+    searchFlight = new SearchFlight(page); // Creating an instance of SearchFlight page
+    filterResults = new FilterResults(page); // Creating an instance of Filter page
+});
+
+test.beforeEach(async () => {
     await searchFlight.open(); // Opening search flight page
-    availableAirlines = await searchFlight.searchForFlights(tripType, origin, destination, 2, 2, 1, cabinClass, false); // Performing flight search
+    availableAirlines = await searchFlight.searchForFlights(tripType, origin, destination, 2, 2, 1, cabinClass, false); // Performing flight search and assigning the airlines from the response to a variable
 });
 
 test('Search Flight and filter by Number of Stops', async () => {
-    // Test to filter flights by number of stops
-    await searchFlight.filterFlightsByNumberOfStops();
+    await filterResults.filterFlightsByNumberOfStops();
 });
 
 test('Search Flight and filter by Airlines', async () => {
-    // Test to filter flights by airlines
-    await searchFlight.filterFlightsByAirlines(availableAirlines);
+    await filterResults.filterFlightsByAirlines(availableAirlines);
 });
 
 test('Search Flight and filter by Price', async () => {
-    // Test to filter flights by price
-    await searchFlight.filterFlightsByPrice();
+    await filterResults.filterFlightsByPrice();
 });
 
 test.afterEach(async () => {
-    // Closing the browser after each test
     await browser.close();
 });
 
 test.afterAll(async () => {
-    // Closing the browser after all tests
     await browser.close();
 });
