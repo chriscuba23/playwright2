@@ -153,7 +153,7 @@ class FilterResults {
   async filterFlightsByPrice() {
 
     let filterByButton = this.page.getByTestId('resultPage-toggleFiltersButton-button');
-    let filterByHeaderFlights = this.page.getByTestId('resultPage-filters-header');
+    let filterByHeaderFlights = await this.page.getByTestId('resultPage-filters-header');
     let totalFlightsText = await this.page.locator('span[data-testid="resultPage-filters-text"] + span').textContent();
     let resetFilterAll = this.page.getByTestId('resultPage-filterHeader-allFilterResetButton-button');
     let resetFilterPrice = this.page.getByTestId('resultPage-filterHeader-PRICEFilterResetButton-button');
@@ -242,7 +242,7 @@ class FilterResults {
     const allPricesArrayUnfilteredNew = await allPricesArrayUnfiltered.map(replaceAllNonDigitChars);
 
     // Expecting unfiltered prices array to be the same as original prices array after resetting price filter
-    expect(allPricesArrayNew.toString() == allPricesArrayUnfilteredNew.toString()).toBeTruthy();
+    expect(await allPricesArrayNew.toString() == await allPricesArrayUnfilteredNew.toString()).toBeTruthy();
 
     // Iterating over each price to ensure it falls within the original price range after resetting price filter
     for (let i = 0; i < await allPrices.count(); i++) {
