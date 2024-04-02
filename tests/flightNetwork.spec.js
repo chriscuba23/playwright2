@@ -21,7 +21,7 @@ let destination = 'ARN'; // Destination airport code (Stockholm)
 let tripType = 'oneWay';
 let cabinClass = ['Economy', 'Premium', 'Business', 'First']; // later in the code we are going to get a random cabin class from the cabinClass array
 let numOfPassengers = {adult: 2, child: 2, infant: 1}
-let pixelsToDragPriceHandles = { min: 10, max: -500 }
+let pixelsToDragPriceHandles = { min: 10, max: -450 }
 let pixelsToDragTimeHandles = { max: -400 }
 
 let availableAirlines; // Declaring variable that will hold the airlines of the response
