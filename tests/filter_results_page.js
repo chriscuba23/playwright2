@@ -282,6 +282,7 @@ class FilterResults {
     await expect(filterByButton).toContainText('Close');
     await expect(travelTimeHeader).toContainText('Travel time');
 
+    await this.page.waitForTimeout(1000);
     await this.page.mouse.move(startToX, startToY);
     await this.page.mouse.down();
     await this.page.mouse.move(startToX + offsetToX, startToY);
