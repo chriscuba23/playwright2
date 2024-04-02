@@ -170,9 +170,6 @@ class FilterResults {
     let priceFromStartingValue = await priceFrom.textContent();
     let priceToStartingValue = await priceTo.textContent();
 
-
-    let allPrices = await this.page.getByTestId('result-trip-price-info-button');
-
     // Defining the center(X,Y) of the handle elements to click
     const handleSliderFrom = await priceHandleFrom.boundingBox(); // boundingBox() method returns the bounding box of the given element
     const startFromX = handleSliderFrom.x + handleSliderFrom.width / 2;
@@ -194,7 +191,7 @@ class FilterResults {
 
     // Replace non-digit characters of the price, keep only the numerical value and assign to a const
 
-    let allPricesArray = await this.page.getByTestId('result-trip-price-info-button').allTextContents();
+    let allPricesArray = await (this.page.getByText('Standard ticket').getByTestId('result-trip-price-info-button')).allTextContents();
     const allPricesArrayNew = await allPricesArray.map(replaceAllNonDigitChars);
 
     // Perform mouse interaction to drag the slider handles
@@ -202,7 +199,7 @@ class FilterResults {
     await this.page.mouse.down(); // click down left mouse button and hold
     await this.page.mouse.move(startFromX + offsetFromX, startFromY); // drag to the given offset
     await this.page.mouse.up(); // release mouse button
-
+  
     await this.page.mouse.move(startToX, startToY);
     await this.page.mouse.down();
     await this.page.mouse.move(startToX + offsetToX, startToY);
@@ -225,6 +222,8 @@ class FilterResults {
     // Expecting filtered prices array to be different from original prices array
     expect(allPricesArrayNew.toString() == allPricesArrayFilteredNew.toString()).toBeFalsy();
 
+    let allPrices = await this.page.getByText('Standard ticket').getByTestId('result-trip-price-info-button');
+
     // Iterating over each price to ensure it falls within the selected price range
     for (let i = 0; i < await allPrices.count(); i++) {
       expect(replaceAllNonDigitChars(await allPrices.nth(i).textContent())).toBeGreaterThanOrEqual(replaceAllNonDigitChars(await priceFrom.textContent()));
@@ -239,7 +238,7 @@ class FilterResults {
     await expect(resetFilterPrice).not.toBeAttached();
     await expect(selectedFilterIndicator).not.toBeAttached();
 
-    let allPricesArrayUnfiltered = await this.page.getByTestId('result-trip-price-info-button').allTextContents();
+    let allPricesArrayUnfiltered = await (this.page.getByText('Standard ticket').getByTestId('result-trip-price-info-button')).allTextContents();
     const allPricesArrayUnfilteredNew = await allPricesArrayUnfiltered.map(replaceAllNonDigitChars);
 
     // Expecting unfiltered prices array to be the same as original prices array after resetting price filter
@@ -263,7 +262,7 @@ class FilterResults {
     let selectedFilterIndicator = this.page.getByTestId('resultPage-filterHeader-selectedFiltersIndicator');
     let travelTimeHeader = this.page.getByTestId('resultPage-TRAVEL_TIME-header').getByText('Travel time')
     let travelTimeHandleTo = this.page.getByTestId('resultPage-TRAVEL_TIMEFilter-content').getByTestId('handle-0')
-  
+
     let travelTimeTo = await this.page.getByTestId('resultPage-TRAVEL_TIMEFilter-content').locator('div.slider-tracks + div')
 
     // Getting starting travel time range value
@@ -280,8 +279,6 @@ class FilterResults {
     await filterByButton.click();
     await expect(filterByButton).toContainText('Close');
     await expect(travelTimeHeader).toContainText('Travel time');
-
-    await this.page.waitForTimeout(3000);
 
     await this.page.mouse.move(startToX, startToY);
     await this.page.mouse.down();

@@ -13,13 +13,13 @@ let filterResults; // filterResults instance
 let origin = 'ATH'; // Origin airport code (Athens)
 let destination = 'ARN'; // Destination airport code (Stockholm)
 
-// NOTE we can try different origin and destination airports using a faker library but may introduce flakyness
+// NOTE we can try different origin and destination airports using a faker library but it may introduce flakyness
 // let origin = faker.airline.airport().iataCode
 // let destination = faker.airline.airport().iataCode
 
 // declaring hardcoded-value variables
-let tripType = 'oneWay'; // Trip type (could be 'return', 'oneWay', 'multiStop')
-let cabinClass = 'First'; // Cabin class (could be 'Economy', 'Premium', 'Business', 'First')
+let tripType = 'oneWay';
+let cabinClass = ['Economy', 'Premium', 'Business', 'First']; // later in the code we are going to get a random cabin class from the cabinClass array
 let numOfPassengers = {adult: 2, child: 2, infant: 1}
 let pixelsToDragPriceHandles = { min: 10, max: -500 }
 let pixelsToDragTimeHandles = { max: -400 }
@@ -33,7 +33,7 @@ test.beforeEach(async () => {
     searchFlight = new SearchFlight(page); // Creating an instance of SearchFlight page
     filterResults = new FilterResults(page); // Creating an instance of Filter page
     await searchFlight.open(); // Opening search flight page
-    availableAirlines = await searchFlight.searchForFlights(tripType, origin, destination, numOfPassengers.adult, numOfPassengers.child, numOfPassengers.infant, cabinClass, false); // Performing flight search and assigning the airlines from the response to a variable
+    availableAirlines = await searchFlight.searchForFlights(tripType, origin, destination, numOfPassengers.adult, numOfPassengers.child, numOfPassengers.infant, cabinClass[Math.floor(Math.random() * cabinClass.length)], false); // Performing flight search and assigning the airlines from the response to a variable
 });
 
 test('Search Flight and filter by Number of Stops', async () => {
