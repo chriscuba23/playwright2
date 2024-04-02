@@ -20,6 +20,8 @@ let destination = 'ARN'; // Destination airport code (Stockholm)
 // declaring hardcoded-value variables
 let tripType = 'oneWay'; // Trip type (could be 'return', 'oneWay', 'multiStop')
 let cabinClass = 'First'; // Cabin class (could be 'Economy', 'Premium', 'Business', 'First')
+let pixelsToDragPriceHandles = { min: 10, max: -500 }
+let pixelsToDragTimeHandles = { max: -400 }
 
 let availableAirlines; // Declaring variable that will hold the airlines of the response
 
@@ -42,7 +44,11 @@ test('Search Flight and filter by Airlines', async () => {
 });
 
 test('Search Flight and filter by Price', async () => {
-    await filterResults.filterFlightsByPrice();
+    await filterResults.filterFlightsByPrice(pixelsToDragPriceHandles.min, pixelsToDragPriceHandles.max);
+});
+
+test('Search Flight and filter by Travel time', async () => {
+    await filterResults.filterFlightsByTravelTime(pixelsToDragTimeHandles.max);
 });
 
 test.afterEach(async () => {

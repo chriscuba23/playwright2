@@ -1,6 +1,8 @@
 // This class represents functionalities related to searching for flights
 
 const { test, expect } = require('@playwright/test');
+const moment = require('moment');
+
 class FilterResults {
   // Constructor to initialize the class with a page object
   constructor(page) {
@@ -150,7 +152,7 @@ class FilterResults {
   }
 
   // Method to filter flights by price range
-  async filterFlightsByPrice() {
+  async filterFlightsByPrice(pixelsToDragMin, pixelsToDragMax) {
 
     let filterByButton = this.page.getByTestId('resultPage-toggleFiltersButton-button');
     let filterByHeaderFlights = await this.page.getByTestId('resultPage-filters-header');
@@ -161,7 +163,6 @@ class FilterResults {
     let priceHeader = this.page.getByTestId('resultPage-PRICE-header').getByText('Price');
     let priceHandleFrom = this.page.getByTestId('resultPage-PRICEFilter-content').getByTestId('handle-0');
     let priceHandleTo = this.page.getByTestId('resultPage-PRICEFilter-content').getByTestId('handle-1');
-    let priceSliderTrack = this.page.getByTestId('resultPage-PRICEFilter-content').getByTestId('track-0');
     let priceFrom = await this.page.getByTestId('resultPage-PRICEFilter-content').locator('div.slider-tracks + div');
     let priceTo = await this.page.getByTestId('resultPage-PRICEFilter-content').locator('div.slider-tracks + div + div');
 
@@ -181,9 +182,9 @@ class FilterResults {
     const startToX = handleSliderTo.x + handleSliderTo.width / 2;
     const startToY = handleSliderTo.y + handleSliderTo.height / 2;
 
-    // Define the desired offset to drag the slider handles
-    const offsetFromX = 10; // drag the From handle 10 pixels to the right
-    const offsetToX = -500; // drag the To handle 500 pixels to the left
+    // Define the desired offset to drag the slider handles on the slider (525 pixels)
+    const offsetFromX = pixelsToDragMin; // drag the From handle x pixels to the right
+    const offsetToX = pixelsToDragMax; // drag the To handle x pixels to the left
 
 
     await expect(filterByButton).toContainText('Filter by');
@@ -250,6 +251,69 @@ class FilterResults {
       expect(replaceAllNonDigitChars(await allPrices.nth(i).textContent())).toBeLessThanOrEqual(replaceAllNonDigitChars(await priceToStartingValue));
     }
   }
+
+  // Method to filter flights by travel time range
+  async filterFlightsByTravelTime(pixelsToDragMax) {
+
+    let filterByButton = this.page.getByTestId('resultPage-toggleFiltersButton-button');
+    let filterByHeaderFlights = await this.page.getByTestId('resultPage-filters-header');
+    let totalFlightsText = await this.page.locator('span[data-testid="resultPage-filters-text"] + span').textContent();
+    let resetFilterAll = this.page.getByTestId('resultPage-filterHeader-allFilterResetButton-button');
+    let resetFilterTravelTime = this.page.getByTestId('resultPage-filterHeader-TRAVEL_TIMEFilterResetButton-button')
+    let selectedFilterIndicator = this.page.getByTestId('resultPage-filterHeader-selectedFiltersIndicator');
+    let travelTimeHeader = this.page.getByTestId('resultPage-TRAVEL_TIME-header').getByText('Travel time')
+    let travelTimeHandleTo = this.page.getByTestId('resultPage-TRAVEL_TIMEFilter-content').getByTestId('handle-0')
+  
+    let travelTimeTo = await this.page.getByTestId('resultPage-TRAVEL_TIMEFilter-content').locator('div.slider-tracks + div')
+
+    // Getting starting travel time range value
+
+    let travelTimeToStartingValue = await travelTimeTo.textContent();
+
+    const handleSliderTo = await travelTimeHandleTo.boundingBox();
+    const startToX = handleSliderTo.x + handleSliderTo.width / 2;
+    const startToY = handleSliderTo.y + handleSliderTo.height / 2;
+
+    const offsetToX = pixelsToDragMax; // drag the To handle x pixels to the left
+
+    await expect(filterByButton).toContainText('Filter by');
+    await filterByButton.click();
+    await expect(filterByButton).toContainText('Close');
+    await expect(travelTimeHeader).toContainText('Travel time');
+
+    await this.page.waitForTimeout(3000);
+
+    await this.page.mouse.move(startToX, startToY);
+    await this.page.mouse.down();
+    await this.page.mouse.move(startToX + offsetToX, startToY);
+    await this.page.mouse.up();
+
+    // Waiting for the response containing filtered flights by price
+    const responsePromise = await this.page.waitForResponse((response) => response.url().includes("/graphql/SearchOnResultPage"));
+    const responseBody = await responsePromise.json();
+
+    let filteredFlightsCount = await responseBody.data.search.filteredFlightsCount;
+
+    await expect(filterByHeaderFlights).toContainText(`${filteredFlightsCount} of ${totalFlightsText.replace(': ', '').toLowerCase()}`);
+    await expect(selectedFilterIndicator).toContainText('Travel time');
+    await expect(resetFilterAll).toContainText('Reset filter');
+    await expect(resetFilterTravelTime).toContainText('Reset filter');
+
+    let allTravelTimes = await this.page.getByTestId('searchResults-segment-duration');
+
+    // Iterating over each travel time to ensure it falls within the selected travel time range
+    for (let i = 0; i < await allTravelTimes.count(); i++) {
+      expect(convertTimeStringToMilliseconds(await allTravelTimes.nth(i).textContent())).toBeLessThanOrEqual(convertTimeStringToMilliseconds(await travelTimeTo.textContent()));
+    }
+
+    await resetFilterTravelTime.click();
+    await expect(filterByHeaderFlights).toContainText(totalFlightsText);
+    await expect(travelTimeTo).toContainText(travelTimeToStartingValue);
+    await expect(resetFilterAll).not.toBeAttached();
+    await expect(resetFilterTravelTime).not.toBeAttached();
+    await expect(selectedFilterIndicator).not.toBeAttached();
+
+  }
 }
 
 // Function to scroll until a specified element is visible on the page
@@ -268,5 +332,16 @@ function replaceAllNonDigitChars(price) {
   return strippedPrice;
 }
 
+// Function to take the hours and minutes as arguments and return the total duration in milliseconds calculated using Moment.js.
+
+function convertTimeStringToMilliseconds(timeString) {
+
+  const [hours] = timeString.split('h '); // split the time string into hours
+  const durationInMilliseconds = moment.duration(hours).asMilliseconds();   // Convert hours to milliseconds
+
+  return durationInMilliseconds;
+}
+
 // Exporting the FilterResults class
+
 module.exports = FilterResults;
