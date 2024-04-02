@@ -242,7 +242,7 @@ class FilterResults {
     const allPricesArrayUnfilteredNew = await allPricesArrayUnfiltered.map(replaceAllNonDigitChars);
 
     // Expecting unfiltered prices array to be the same as original prices array after resetting price filter
-    expect(await allPricesArrayNew.toString() == await allPricesArrayUnfilteredNew.toString()).toBeTruthy();
+    expect(allPricesArrayNew.toString() == allPricesArrayUnfilteredNew.toString()).toBeTruthy();
 
     // Iterating over each price to ensure it falls within the original price range after resetting price filter
     for (let i = 0; i < await allPrices.count(); i++) {
