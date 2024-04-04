@@ -43,8 +43,3 @@ console.log(filteredCountryObj)
     // });
 
     // this is a commit test
-
-
- // this is another change
-
- // another
