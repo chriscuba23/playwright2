@@ -29,7 +29,7 @@ let contactPhone2 = '976.620.4768 x7104' // faker.phone.number() // FIXME number
 // FIXME address has no validation in relativity. For example city and state/province may not match with each other but still be accepted
 // FIXME address data is not mandatory to be entered at the Contact Creation form and does not throw an error if it doesnt
 
-let contactAddress1 = faker.location.streetAddress();
+let contactAddress1 = faker.location.streetAddress(); 
 let contactAddress2 = faker.location.secondaryAddress(); // FIXME secondaryAddress info not appearing at Contact List
 let contactCity = faker.location.city();
 let contactStateOrProvince = faker.location.state();
