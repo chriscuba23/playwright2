@@ -41,11 +41,3 @@ console.log(filteredCountryObj)
     //   expect(filteredSegments.length).toBeLessThan(3)
     //   expect(filteredSegments.length).toBeGreaterThan(0)
     // });
-
-    // this is a commit test
-
-    // this is another commit 
-
-    // this is another other commit
-
-       // this is the newest commit
