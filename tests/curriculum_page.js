@@ -22,7 +22,7 @@ class CurriculumPage {
     await expect(clearAllFiltersButton).toBeAttached(); // Asserting that the Clear all filters button is attached
   }
 
-  // Method to enroll in a class
+  // Method to enroll in a class. Arguments are the kid's name and the index of the enrolling class so as to use it for the nth frame locator to choose between curricula
   async enrollInClass(learnerName, curriculaNth) {
     // Locating necessary elements
     let curriculaLinks = this.page.getByRole('link', { name: 'Free' });
@@ -58,18 +58,17 @@ class CurriculumPage {
     let modalCloseButton = this.page.getByRole('button');
     let unenrollButton = this.page.getByRole('button', { name: 'Unenroll' });
     let unenrollButtonOnModal = this.page.getByLabel('Unenroll from the class').getByRole('button', { name: 'Unenroll' });
-    let reasonForUnenrollDropDown = this.page.locator('div').filter({ hasText: /^Select the reason for unenrollment$/ }).first();
+    let reasonForUnenrollDropDownButton = this.page.locator('div').filter({ hasText: /^Select the reason for unenrollment$/ }).first();
     let unenrollOption = this.page.getByRole('option', { name: 'I wish to enroll in another' });
     let snackbar = this.page.getByText('Successfully withdrawn from the class');
 
-    const unenrollButtonHover = await unenrollButton.boundingBox(); // Getting coordinates of unenroll button
+    const unenrollButtonHover = await unenrollButton.boundingBox(); // Getting coordinates of the unenroll button in order to hover in the center
 
     // Hovering and clicking on unenroll button
-    await this.page.mouse.move(unenrollButtonHover.x + unenrollButtonHover.width / 2, unenrollButtonHover.y + unenrollButtonHover.height / 2);
-    await this.page.mouse.click(unenrollButtonHover.x + unenrollButtonHover.width / 2, unenrollButtonHover.y + unenrollButtonHover.height / 2);
+    await this.page.mouse.move(unenrollButtonHover.x + unenrollButtonHover.width / 2, unenrollButtonHover.y + unenrollButtonHover.height / 2); // hover in the center
+    await this.page.mouse.click(unenrollButtonHover.x + unenrollButtonHover.width / 2, unenrollButtonHover.y + unenrollButtonHover.height / 2); // click on it
 
-    await unenrollButton.click();
-    await reasonForUnenrollDropDown.click();
+    await reasonForUnenrollDropDownButton.click();
     await unenrollOption.click();
     await expect(unenrollOption).not.toBeVisible(); // Asserting that the unenroll option is not visible
     await this.page.waitForTimeout(1000);
@@ -82,8 +81,8 @@ class CurriculumPage {
     await expect(classLearnersModal).not.toBeAttached(); // Asserting that the learner is not attached
   }
 
-  // Method to attempt to enroll in a nonexistent class
-  async enrollInNonexistentClass(learnerName, curriculaNth) {
+  // Method to attempt to enroll in a non-available class
+  async enrollInNonAvailableClass(learnerName, curriculaNth) {
     // Locating necessary elements
     let curriculaLinks = this.page.getByRole('link', { name: 'Free' });
     let enrollButtonsOnCards = this.page.locator('cmp-card').getByRole('button').filter({ hasText: 'Enroll' });
@@ -91,7 +90,7 @@ class CurriculumPage {
     let infoButton = this.page.locator('label path').first();
     let message = this.page.getByText('Does not meet the required age criteria to join this class');
 
-    // Attempting to enroll in the nonexistent class
+    // Attempting to enroll in the non-available class
     await curriculaLinks.nth(curriculaNth).click();
     await enrollButtonsOnCards.nth(0).click();
 

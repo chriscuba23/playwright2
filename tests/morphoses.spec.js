@@ -3,14 +3,14 @@ const { test } = require('@playwright/test'); // Importing test function from Pl
 const LoginPage = require('./login_page.js'); // Importing LoginPage class
 const CurriculumPage = require('./curriculum_page.js'); // Importing CurriculumPage class
 
-let loginPage; 
+let loginPage;
 let curriculumPage;
 let browser; // Declaration of browser variable
 let page; // Declaration of page variable
-let email = 'chriscuba23@gmail.com'; 
+let email = 'chriscuba23@gmail.com';
 let password = 'chriscuba23@gmail.co';
 let name = 'Chris';
-let kidName = 'Eve'; 
+let kidName = 'Eve';
 let curriculaArray = ['Οι Απίθανοι', 'Explore the world']; // Initializing curriculaArray variable with curriculum names
 
 test.beforeEach(async () => {
@@ -28,12 +28,12 @@ test.afterEach(async () => {
 
 test('Enroll a user\'s kid in a class of a free/demo curriculum', async () => {
     await curriculumPage.findFreeDemoCurriculum(); // Finding the free/demo curriculum
-    await curriculumPage.enrollInClass(kidName, curriculaArray.indexOf('Οι Απίθανοι')); // Enrolling the user's kid in a class
+    await curriculumPage.enrollInClass(kidName, curriculaArray.indexOf('Οι Απίθανοι')); // Enrolling the user's kid in a specific class
     await curriculumPage.unenrollClass(kidName); // Unenrolling the user's kid from a class
-    
+
 });
 
-test('Attempt to enroll in a non-existent class', async () => {
+test('Attempt to enroll in a non-available class', async () => {
     await curriculumPage.findFreeDemoCurriculum(); // Finding the free/demo curriculum
-    await curriculumPage.enrollInNonexistentClass(kidName, curriculaArray.indexOf('Explore the world')); // Attempting to enroll in a non-existent class
+    await curriculumPage.enrollInNonAvailableClass(kidName, curriculaArray.indexOf('Explore the world')); // Attempting to enroll in a non-available class
 });
